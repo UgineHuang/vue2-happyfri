@@ -71,7 +71,8 @@ export default {
         'answerTime',
         'onlinePlayers',
         'ANOTHER',
-        'USERNAME'
+        'USERNAME',
+        'stompClient'
 ]),
   	methods: {
   		...mapActions([
@@ -120,8 +121,26 @@ export default {
         choosePlayer(i, aother){
 	  	    this.choosedPlayer = aother;
             this.setAnother(aother);
-            console.log(this.USERNAME)
-            console.log(this.ANOTHER)
+//            console.log(this.USERNAME)
+//            console.log(this.ANOTHER)
+            this.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
+                console.log('广播成功');
+                let mess = JSON.parse(msg.body);
+                console.log(mess);
+                if(mess.chatMessage.type=='ADD_USER'){
+                    console.log('ADD_USER');
+                    let onlinePlayers = eval(mess.chatMessage.content);
+                    self.callback(onlinePlayers);
+                }else if(mess.chatMessage.type=='CHOOSE_USER'){
+                    console.log('CHOOSE_USER');
+                    this.goToPlay();
+                }else if(mess.chatMessage.type=='DO_EXAM'){
+
+                }
+            });
+            this.stompClient.send("/app/game.choose_user", {},
+                JSON.stringify({type: 'CHOOSE_USER', content: this.ANOTHER, sender: this.USERNAME}));
+
         },
         loading(){
             this.isLoading = true;

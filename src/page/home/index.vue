@@ -39,7 +39,7 @@ export default {
         ...mapActions([
             'connectWebsocket', 'setPritimer', 'setUserName'
         ]),
-        initWebSocket() {
+        initWebSocket(callback) {
             this.connectWebsocket();
             let self= this;
             // 断开重连机制,尝试发送消息,捕获异常发生时重连
@@ -63,25 +63,34 @@ export default {
             let self = this;//小心处理this的指向
 
             setTimeout(function () {
-                    self.stompClient.send("/app/game.add_user",
-                    {},
-                    JSON.stringify({type: 'ADD_USER', content:'username_c', sender: 'username_c'}),
-                );
+                    self.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
+                        console.log('广播成功');
+                        let mess = JSON.parse(msg.body);
+                        console.log(mess);
+                        if(mess.chatMessage.type=='ADD_USER'){
+                            console.log('ADD_USER');
+                            let onlinePlayers = eval(mess.chatMessage.content);
+                            self.callback(onlinePlayers);
+                        }else if(mess.chatMessage.type=='CHOOSE_USER'){
+                            console.log('CHOOSE_USER');
+                        }else if(mess.chatMessage.type=='DO_EXAM'){
+
+                        }
+                    });
+                    self.stompClient.send("/app/game.add_user", {},
+                    JSON.stringify({type: 'ADD_USER', content: self.username, sender: self.username}));
             },1000);
-            
 
             //建立socket，并发送用户名，获取到在线玩家后调用callback
-
-            // setTimeout(function () {
-            //     let onlinePlayers = ["aa","bb","cc"];//在线玩家
-            //     self.callback(onlinePlayers);
-            // },10000);
+//             setTimeout(function () {
+//                 self.callback(onlinePlayers);
+//             },10000);
         },
         callback(arr){
-            self.isShow = false;
-            self.$refs.register.className = 'hidden';
+            this.isShow = false;
+            this.$refs.register.className = 'hidden';
             //设置state.onlinePlayers
-            //this.$store.commit('SET_ONLINEPLAYERS',arr);
+            this.$store.commit('SET_ONLINEPLAYERS',arr);
         }
     }
 }

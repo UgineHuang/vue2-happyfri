@@ -19,7 +19,7 @@ export default {
         commit('SET_ANOTHER', name);
 
     },
-	connectWebsocket ({ commit, state }) {
+	connectWebsocket ({ commit, state },callback) {
         let url ="ws://47.100.36.39:8123/ws"
         state.stompClient = Stomp.client(url);
         // 定义客户端的认证信息,按需求配置
@@ -27,15 +27,19 @@ export default {
         };
         // 向服务器发起websocket连接
         state.stompClient.connect({'Access-Control-Allow-Origin':"*"},(frame) => {
-            state.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
-                console.log('广播成功');
-				console.log(msg.body);  // msg.body存放的是服务端发送给我们的信息
-				
-			});
-            // state.stompClient.send("/app/game.add_user",
-            //     headers,
-            //     JSON.stringify({type: 'ADD_USER', content:'username_A', sender: 'username_A'}),
-			// );   //用户加入接口
+            console.log('连接成功');
+            // state.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
+            //     console.log('广播成功');
+            //     console.log(JSON.parse(msg.body));  // msg.body存放的是服务端发送给我们的信息
+            //     let mess = JSON.parse(msg.body);
+            //     if(mess.type='ADD_USER'){
+            //
+            //     }else if(mess.type='CHOOSE_USER'){
+            //
+            //     }else if(mess.type='DO_EXAM'){
+            //
+            //     }
+            // });
         }, (err) => {
             // 连接发生错误时的处理函数
             console.log('失败');
