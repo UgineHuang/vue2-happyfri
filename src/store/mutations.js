@@ -6,6 +6,10 @@ const SET_ONLINEPLAYERS = 'SET_ONLINEPLAYERS'
 const SET_USERNAME = 'SET_USERNAME'
 const SET_ANOTHER = 'SET_ANOTHER'
 
+const STAFF_UPDATEWEBSOCKET = 'STAFF_UPDATEWEBSOCKET'
+const STAFF_SEND = 'STAFF_SEND'
+
+const PRIFIX_TIMER = 'PRIFIX_TIMER'
 
 export default {
 	//点击进入下一题
@@ -40,5 +44,14 @@ export default {
     },
     [SET_ANOTHER](state,name){
         state.ANOTHER = name;
-    }
+    },
+	[STAFF_UPDATEWEBSOCKET](state, websock) {
+        state.stompClient = websock
+    },
+    [STAFF_SEND](state, text) {
+        state.stompClient.send(text)
+	},	
+	[PRIFIX_TIMER](state, timer) {
+		state.pri_timer = timer;
+	}
 }

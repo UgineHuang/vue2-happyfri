@@ -18,5 +18,35 @@ export default {
     setAnother({commit},name){
         commit('SET_ANOTHER', name);
 
-    }
+    },
+	connectWebsocket ({ commit, state }) {
+        let url ="ws://47.100.36.39:8123/ws"
+        state.stompClient = Stomp.client(url);
+        // 定义客户端的认证信息,按需求配置
+        let headers = {
+        };
+        // 向服务器发起websocket连接
+        state.stompClient.connect({'Access-Control-Allow-Origin':"*"},(frame) => {
+            state.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
+                console.log('广播成功');
+				console.log(msg.body);  // msg.body存放的是服务端发送给我们的信息
+				
+			});
+            // state.stompClient.send("/app/game.add_user",
+            //     headers,
+            //     JSON.stringify({type: 'ADD_USER', content:'username_A', sender: 'username_A'}),
+			// );   //用户加入接口
+        }, (err) => {
+            // 连接发生错误时的处理函数
+            console.log('失败');
+            console.log(err);
+        });
+        commit('STAFF_UPDATEWEBSOCKET', state.stompClient)
+        // 只有定义了onopen方法，才能继续实现接收消息，即在使用的地方调用onmessage方法。
+        state.stompClient.onopen = function () {
+        }
+	},
+	setPritimer({ commit },timer){
+		commit('PRIFIX_TIMER', timer)
+	}
 }

@@ -175,7 +175,11 @@ const state = {
 	answerid: [], //答案id
     onlinePlayers:[],
     USERNAME:'',
-    ANOTHER:''
+    ANOTHER:'',
+	answerid: [], //答案id,
+	stompClient: null,
+	pri_timer: null,
+
 }
 
 export default new Vuex.Store({

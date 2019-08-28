@@ -16,6 +16,9 @@
 
 <script>
 import itemcontainer from '../../components/itemcontainer'
+
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 import { mapState, mapActions } from 'vuex'
 
 export default {
@@ -26,38 +29,60 @@ export default {
             isShow: true
         }
     },
-    computed: mapState([
-        'USERNAME'
-    ]),
   	components: {
   		itemcontainer
   	},
+    computed: mapState([
+        'stompClient', 'pri_timer', 'USERNAME'
+        ]),
     methods: {
         ...mapActions([
-            'setUserName'
+            'connectWebsocket', 'setPritimer', 'setUserName'
         ]),
+        initWebSocket() {
+            this.connectWebsocket();
+            let self= this;
+            // 断开重连机制,尝试发送消息,捕获异常发生时重连
+            let tempTimer = setInterval(() => {
+                try {
+                    self.stompClient.send("testrrr");
+                } catch (err) {
+                    console.log("断线了: " + err);
+                    self.connectWebsocket();
+                }
+            }, 10000);
+            this.setPritimer(tempTimer);
+        },
+
         submit(){
+            this.initWebSocket();
+
             let randomString = Math.floor(Math.random()*(99999-9999+1)+9999);
             this.username+= randomString; //用户名+随机数
-            //设置state.USERNAME
             this.setUserName(this.username);
+            let self = this;//小心处理this的指向
 
-            self = this;//小心处理this的指向
-            //建立socket，并发送用户名，获取到在线玩家后调用callback
             setTimeout(function () {
-                let onlinePlayers = ["aa","bb","cc"];//在线玩家
-                self.callback(onlinePlayers);
+                    self.stompClient.send("/app/game.add_user",
+                    {},
+                    JSON.stringify({type: 'ADD_USER', content:'username_c', sender: 'username_c'}),
+                );
             },1000);
+            
+
+            //建立socket，并发送用户名，获取到在线玩家后调用callback
+
+            // setTimeout(function () {
+            //     let onlinePlayers = ["aa","bb","cc"];//在线玩家
+            //     self.callback(onlinePlayers);
+            // },10000);
         },
         callback(arr){
             self.isShow = false;
             self.$refs.register.className = 'hidden';
             //设置state.onlinePlayers
-            this.$store.commit('SET_ONLINEPLAYERS',arr);
+            //this.$store.commit('SET_ONLINEPLAYERS',arr);
         }
-    },
-    created(){
-        
     }
 }
 </script>

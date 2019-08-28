@@ -144,9 +144,9 @@ export default {
 			//页面进来,就需要监听websocket收到的信息，只要收到匹配信息就跳转对战页面，调用goToPlay()
             let self = this;
 //            self.loading();
-            setTimeout(function () {
-                self.goToPlay();
-            },9000);
+            // setTimeout(function () {
+            //     self.goToPlay();
+            // },2000);
 		}else{
             this.$Progress.start();
             var self = this;
