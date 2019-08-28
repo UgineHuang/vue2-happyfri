@@ -11,5 +11,12 @@ export default {
 	//初始化信息
 	initializeData({ commit }) {
 		commit('INITIALIZE_DATA');
-	}
+	},
+    setUserName({ commit }, name) {
+        commit('SET_USERNAME', name);
+    },
+    setAnother({commit},name){
+        commit('SET_ANOTHER', name);
+
+    }
 }

@@ -2,6 +2,11 @@ const ADD_ITEMNUM = 'ADD_ITEMNUM'
 const REMBER_ANSWER = 'REMBER_ANSWER'
 const REMBER_TIME = 'REMBER_TIME'
 const INITIALIZE_DATA = 'INITIALIZE_DATA'
+const SET_ONLINEPLAYERS = 'SET_ONLINEPLAYERS'
+const SET_USERNAME = 'SET_USERNAME'
+const SET_ANOTHER = 'SET_ANOTHER'
+
+
 export default {
 	//点击进入下一题
 	[ADD_ITEMNUM](state, num) {
@@ -27,4 +32,13 @@ export default {
 		state.allTime = 0;
 		state.answerid = [];
 	},
+    [SET_ONLINEPLAYERS](state,arr){
+	    state.onlinePlayers = arr;
+    },
+    [SET_USERNAME](state,name){
+        state.USERNAME = name;
+    },
+    [SET_ANOTHER](state,name){
+        state.ANOTHER = name;
+    }
 }

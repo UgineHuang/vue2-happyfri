@@ -3,17 +3,17 @@
     	<header class="top_tips" v-if="fatherComponent == 'home'">
     		<span class="num_tip">快到垃圾桶里来</span>
     	</header>
-    	<div v-if="fatherComponent == 'home'" >
+    	<div v-if="fatherComponent == 'home'">
     		<div class="home_logo item_container_style"></div>
-            <div class="players">
+            <div class="players" v-loading="isLoading">
                 <h3>请选择以下玩家对战</h3>
                 <ul>
-                    <li v-for="(item, index) in onlinePlayers" @click="choosePlayer(index,item.id)">
-                        <span class="option_detail" v-bind:class="{'choosed':choosedPlayer==item.id}">{{item.name}}</span>
+                    <li v-for="(item, index) in onlinePlayers" @click="choosePlayer(index,item)">
+                        <span class="option_detail" v-bind:class="{'choosed':choosedPlayer==item}">{{item}}</span>
                     </li>
                 </ul>
             </div>
-    		<div @click="goToPlay()" class="start button_style" ></div>
+    		<div @click="loading()" class="start button_style" ></div>
     	</div>
     	<div v-if="fatherComponent == 'item'" >
     		<div class="item_back item_container_style">
@@ -54,21 +54,12 @@ export default {
 			itemId: null, //题目ID
 			choosedNum: null, //选中答案索引
 			choosedId:null, //选中答案id
-            onlinePlayers:[{
-			    name: 'aaa',
-                id:'1'
-            },{
-                name: 'bbb',
-                id:'2'
-            },{
-                name: 'ccc',
-                id:'3'
-            }],
             choosedPlayer: null,
             myScore: 0,
             anOtherScore: 10,
             startVal: 0,
-            endVal: 20
+            endVal: 20,
+            isLoading: false
 		}
 	},
   	props:['fatherComponent'],
@@ -77,11 +68,14 @@ export default {
   		'level', //第几周
   		'itemDetail', //题目详情
   		'timer', //计时器
-        'answerTime'
+        'answerTime',
+        'onlinePlayers',
+        'ANOTHER',
+        'USERNAME'
 ]),
   	methods: {
   		...mapActions([
-  			'addNum', 'initializeData',
+  			'addNum', 'initializeData','setAnother'
   		]),
   		//点击下一题
   		nextItem(){
@@ -123,12 +117,18 @@ export default {
   			}
 	  	},
         //选择玩家
-        choosePlayer(i, id){
-	  	    console.log(id);
-	  	    this.choosedPlayer = id;
+        choosePlayer(i, aother){
+	  	    this.choosedPlayer = aother;
+            this.setAnother(aother);
+            console.log(this.USERNAME)
+            console.log(this.ANOTHER)
+        },
+        loading(){
+            this.isLoading = true;
         },
         //跳转对战页面
         goToPlay(){
+            this.isLoading = false;
             this.$router.push('item');
         },
         //计算得分
@@ -141,7 +141,12 @@ export default {
 		//初始化信息
 		if(this.fatherComponent == 'home') {
 			this.initializeData();
-			document.body.style.backgroundImage = 'url(./static/img/1-1.jpg)';
+			//页面进来,就需要监听websocket收到的信息，只要收到匹配信息就跳转对战页面，调用goToPlay()
+            let self = this;
+//            self.loading();
+            setTimeout(function () {
+                self.goToPlay();
+            },9000);
 		}else{
             this.$Progress.start();
             var self = this;

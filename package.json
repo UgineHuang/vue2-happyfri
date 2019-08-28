@@ -13,6 +13,7 @@
     "vue-count-to": "^1.0.13",
     "vue-progressbar": "^0.7.5",
     "vue-router": "^2.1.1",
+    "vue-slim-loading": "^1.1.0",
     "vuex": "^2.0.0"
   },
   "devDependencies": {

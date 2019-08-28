@@ -75,7 +75,8 @@ const state = {
 			"answer_name": "答案D",
 			"is_standard_answer": 0
 		}]
-	}, {
+	},
+        {
 		"topic_id": 21,
 		"active_topic_id": 4,
 		"type": "MORE",
@@ -106,7 +107,8 @@ const state = {
 			"answer_name": "正确答案",
 			"is_standard_answer": 0
 		}]
-	}, {
+	},
+        {
 		"topic_id": 21,
 		"active_topic_id": 4,
 		"type": "MORE",
@@ -137,7 +139,8 @@ const state = {
 			"answer_name": "C说的不对",
 			"is_standard_answer": 0
 		}]
-	}, {
+	},
+        {
 		"topic_id": 21,
 		"active_topic_id": 4,
 		"type": "MORE",
@@ -170,6 +173,9 @@ const state = {
 		}]
 	}],
 	answerid: [], //答案id
+    onlinePlayers:[],
+    USERNAME:'',
+    ANOTHER:''
 }
 
 export default new Vuex.Store({

@@ -7,12 +7,14 @@ import './style/common'
 import './config/rem'
 
 import VueProgressBar from 'vue-progressbar'
-
+import Loading from 'vue-slim-loading'
 
 Vue.use(VueRouter)
 const router = new VueRouter({
 	routes
 })
+
+Vue.use(Loading, { text: '题目生成中', color: 'green' })
 
 const options = {
     color: '#874b4b',

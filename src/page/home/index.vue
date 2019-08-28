@@ -16,6 +16,7 @@
 
 <script>
 import itemcontainer from '../../components/itemcontainer'
+import { mapState, mapActions } from 'vuex'
 
 export default {
 	name: 'home',
@@ -25,18 +26,34 @@ export default {
             isShow: true
         }
     },
+    computed: mapState([
+        'USERNAME'
+    ]),
   	components: {
   		itemcontainer
   	},
     methods: {
+        ...mapActions([
+            'setUserName'
+        ]),
         submit(){
-            self = this;
-            console.log(this.username);
-            let r = Math.floor(Math.random()*10+1);
+            let randomString = Math.floor(Math.random()*(99999-9999+1)+9999);
+            this.username+= randomString; //用户名+随机数
+            //设置state.USERNAME
+            this.setUserName(this.username);
+
+            self = this;//小心处理this的指向
+            //建立socket，并发送用户名，获取到在线玩家后调用callback
             setTimeout(function () {
-                self.isShow = false;
-                self.$refs.register.className = 'hidden';
+                let onlinePlayers = ["aa","bb","cc"];//在线玩家
+                self.callback(onlinePlayers);
             },1000);
+        },
+        callback(arr){
+            self.isShow = false;
+            self.$refs.register.className = 'hidden';
+            //设置state.onlinePlayers
+            this.$store.commit('SET_ONLINEPLAYERS',arr);
         }
     },
     created(){
