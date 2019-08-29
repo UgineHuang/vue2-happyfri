@@ -2,7 +2,7 @@
   	<div class="home_container">
         <div class="register" ref="register">
             <div class="title">
-                <img class="title_img" src="../../images/icon-trash.png"/>
+                <img class="title_img" src="../../images/lajitong1.png"/>
                 <h1>你是什么垃圾？</h1>
             </div>
             <form>
@@ -35,6 +35,10 @@ export default {
     computed: mapState([
         'stompClient', 'pri_timer', 'USERNAME'
         ]),
+
+    created(){
+        document.body.style.backgroundImage = 'url(./static/img/4-1.jpg)';
+    },
     methods: {
         ...mapActions([
             'connectWebsocket', 'setPritimer', 'setUserName'
@@ -118,11 +122,13 @@ export default {
         justify-content: center;
         align-items: center;
         .title_img{
-            width: 5rem;
+            width: 11rem;
+            margin-left: -2rem;
         }
         h1{
             color: #663300;
             margin: 0.5rem 0;
+            margin-left: 1.5rem;
         }
     }
     .register form {

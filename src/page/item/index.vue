@@ -12,8 +12,10 @@ export default {
   	components: {
    		itemcontainer
   	},
-  	created(){
-  	}
+	  
+    created(){
+        document.body.style.backgroundImage = 'url(./static/img/4-1.jpg)';
+    },
 }
 
 </script>

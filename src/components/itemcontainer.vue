@@ -1,8 +1,7 @@
 <template>
   	<section>
     	<header class="top_tips" v-if="fatherComponent == 'home'">
-    		<span class="num_tip">快到垃圾桶里来</span>
-            <span>{{USERNAME}}</span>
+    		<span class="num_tip">来呀！</span>
     	</header>
     	<div v-if="fatherComponent == 'home'">
     		<div class="home_logo item_container_style"></div>
@@ -21,8 +20,8 @@
     			<div class="item_list_container" v-if="itemDetail.length > 0">
                     <vue-progress-bar></vue-progress-bar>
                     <div class="scoreArea">
-                        <countTo :startVal='m_startVal' :endVal='myScore' :duration='3000' class="myScore"></countTo>
-                        <countTo :startVal='o_startVal' :endVal='anOtherScore' :duration='3000' class="anOtherScore"></countTo>
+                        <countTo :startVal='m_startVal' :endVal='myScore' :duration='3000' :prefix='aaaa'></countTo>
+                        <countTo :startVal='o_startVal' :endVal='anOtherScore' :duration='3000' :prefix='bbbb'></countTo>
                     </div>
     				<div class="item_title">{{itemDetail[itemNum-1].topic_name}}</div>
                     <ul v-loading="hasAnswered">
@@ -40,6 +39,9 @@
     		<span class="next_item button_style" @click="nextItem" v-if="itemNum < itemDetail.length"></span>
     		<span class="submit_item button_style" v-else @click="submitAnswer"></span>
     	</div>
+        <div class="user_name_label_position">
+            <span>我的昵称：{{USERNAME}}</span>
+        </div>
   	</section>
 </template>
 
@@ -63,7 +65,9 @@ export default {
             isLoading: false,
             hasAnswered:false,
             tempScore:0,
-            isOverTime: null
+            isOverTime: null,
+            aaaa: '我方分数：',
+            bbbb: '对方分数：'
 		}
 	},
   	props:['fatherComponent'],
@@ -220,18 +224,18 @@ export default {
 
 <style lang="less">
 	.top_tips{
-		background: url(../images/ziyuan.png) no-repeat;
+		background: url(../images/lajitong.png) no-repeat;
 		z-index: 10;
         position: absolute;
         height: 5.35rem;
         width: 4.25rem;
-        top: 1rem;
+        top: 1.5rem;
         right: 0.3rem;
         background-size: 100%;
 		.num_tip{
             position: absolute;
-            left: -2rem;
-            top: 0.6rem;
+            left: 1.5rem;
+            top: 0rem;
 			height: 0.7rem;
 			width: 4.2rem;
 			font-size: 0.6rem;
@@ -253,6 +257,7 @@ export default {
 		background-image: url(../images/1-2.png);
         background-size: 8rem 40%;
         background-position: left top;
+        top: 2rem;
 	}
 	.item_back{
 		background-image: url(../images/2-1.png);
@@ -366,5 +371,10 @@ export default {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+    }
+    .user_name_label_position{
+        position: fixed;
+        top: 25rem;
+        left: 3.5rem;
     }
 </style>
