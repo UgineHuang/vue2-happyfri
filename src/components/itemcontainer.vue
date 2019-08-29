@@ -67,7 +67,8 @@ export default {
             tempScore:0,
             isOverTime: null,
             aaaa: '我方分数：',
-            bbbb: '对方分数：'
+            bbbb: '对方分数：',
+            count:0
 		}
 	},
   	props:['fatherComponent'],
@@ -81,11 +82,12 @@ export default {
         'ANOTHER',
         'USERNAME',
         'stompClient',
-        'pri_timer'
+        'pri_timer',
 ]),
   	methods: {
   		...mapActions([
-  			'addNum', 'initializeData','setAnother','setItemDetail','setFinalScore','setAnswerTime','connectWebsocket', 'setPritimer'
+  			'addNum', 'initializeData','setAnother','setItemDetail','setFinalScore','setAnswerTime',
+            'connectWebsocket', 'setPritimer','setIsWin','setOther'
   		]),
   		//点击下一题
   		nextItem(){
@@ -126,11 +128,24 @@ export default {
 	  			this.addNum(this.choosedId)
                 this.setFinalScore(this.myScore)
 	  			clearInterval(this.timer)
-	  			this.$router.push('score')
+                let self = this;
+	  			if(this.count<2){
+                    setTimeout(self.goToScore,5000);
+                }else{
+	  			    self.goToScore();
+                }
   			}else{
   				alert('您还没有选择答案哦')
   			}
 	  	},
+        goToScore(){
+	  	    debugger;
+            if(this.myScore > this.anOtherScore) {
+                this.setOther(this.anOtherScore);
+                this.setIsWin(true)
+            }
+            this.$router.push('score')
+        },
         //选择玩家
         choosePlayer(i, aother){
 	  	    this.choosedPlayer = aother;
@@ -159,10 +174,12 @@ export default {
                     this.startVal = this.myScore
                     this.tempScore = 10;
                     this.myScore +=10;
-                }else if(this.answerTime>10000){
+                }else if(this.answerTime<10000){
                     this.startVal = this.myScore
                     this.tempScore = 8;
                     this.myScore +=8;
+                }else{
+                    this.tempScore = 0;
                 }
             }else{
                 this.tempScore = 0;
@@ -187,6 +204,7 @@ export default {
                     if(mess.chatMessage.receiver.indexOf(this.USERNAME) != -1){
                         this.o_startVal = this.anOtherScore;
                         this.anOtherScore += parseInt(mess.chatMessage.content);
+                        this.count++;
                     }
                 }
             });
@@ -204,11 +222,11 @@ export default {
             // },2000);
 		}else{
             this.$Progress.start();
-            var self = this;
-            setTimeout(function () {
-                self.startVal = self.endVal;
-                self.endVal = 50;
-            },5000)
+//            var self = this;
+//            setTimeout(function () {
+//                self.startVal = self.endVal;
+//                self.endVal = 50;
+//            },5000)
         }
 	},
     mounted(){

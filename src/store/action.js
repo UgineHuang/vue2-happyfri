@@ -64,5 +64,11 @@ export default {
 	},
 	setPritimer({ commit },timer){
 		commit('PRIFIX_TIMER', timer)
-	}
+	},
+    setIsWin({ commit },timer){
+        commit('ISWIN', timer)
+    },
+    setOther({ commit },timer){
+        commit('SET_otherScore', timer)
+    }
 }

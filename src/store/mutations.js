@@ -14,6 +14,9 @@ const PRIFIX_TIMER = 'PRIFIX_TIMER'
 const SET_ITEMDETAIL = 'SET_ITEMDETAIL'
 const SET_FINALSCORE = 'SET_FINALSCORE'
 const SET_ANSWERTIME = 'SET_ANSWERTIME'
+const SET_otherScore = 'SET_otherScore'
+
+const ISWIN = 'ISWIN'
 
 export default {
 	//点击进入下一题
@@ -66,5 +69,11 @@ export default {
     },
     [SET_ANSWERTIME](state,name){
         state.answerTime = name;
+    },
+    [ISWIN](state,name){
+        state.isWin = name;
+    },
+    [SET_otherScore](state,name){
+        state.otherScore = name;
     },
 }

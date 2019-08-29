@@ -5,6 +5,7 @@
                 <span></span><span class="score_num">{{finalScore}}</span><span class="fenshu">分！</span>
                 <p v-if="isWin">WIN</p>
                 <p v-else="isWin">LOSE</p>
+                <span>{{otherScore}}</span>
             </header>
         </div>
         <div class="share_button" @click="showCover"></div>
@@ -25,10 +26,9 @@ export default {
             scoreTips:'', //分数提示
             rightAnswer: [2, 7, 12, 13, 18], //正确答案
             scoreTipsArr:['你说，是不是把知识都还给小学老师了？','还不错，但还需要继续加油哦！','不要嘚瑟还有进步的空间！','智商离爆表只差一步了！','你也太聪明啦，葡萄之家欢迎你！'],
-            isWin: false
         }
     },
-    computed: mapState(['answerid','finalScore']),
+    computed: mapState(['answerid','finalScore','isWin','otherScore']),
 	created(){
 //        this.computedScore();
         this.getScoreTip();
