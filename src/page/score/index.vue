@@ -2,7 +2,7 @@
   	<div>
     	<div class="your_scores_container">
             <header class="your_scores">
-                <span></span><span class="score_num">{{score}}</span><span class="fenshu">分！</span>
+                <span></span><span class="score_num">{{finalScore}}</span><span class="fenshu">分！</span>
                 <p v-if="isWin">WIN</p>
                 <p v-else="isWin">LOSE</p>
             </header>
@@ -28,9 +28,9 @@ export default {
             isWin: false
         }
     },
-    computed: mapState(['answerid']),
+    computed: mapState(['answerid','finalScore']),
 	created(){
-        this.computedScore();
+//        this.computedScore();
         this.getScoreTip();
         document.body.style.backgroundImage = 'url(./static/img/4-1.jpg)';
     },

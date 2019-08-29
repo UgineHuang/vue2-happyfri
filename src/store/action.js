@@ -19,6 +19,18 @@ export default {
         commit('SET_ANOTHER', name);
 
     },
+    setItemDetail({commit},itemDetail){
+        commit('SET_ITEMDETAIL', itemDetail);
+
+    },
+    setFinalScore({commit},itemDetail){
+        commit('SET_FINALSCORE', itemDetail);
+
+    },
+    setAnswerTime({commit},itemDetail){
+        commit('SET_ANSWERTIME', itemDetail);
+
+    },
 	connectWebsocket ({ commit, state },callback) {
         let url ="ws://47.100.36.39:8123/ws"
         state.stompClient = Stomp.client(url);

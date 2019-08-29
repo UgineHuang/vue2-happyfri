@@ -14,7 +14,7 @@ const router = new VueRouter({
 	routes
 })
 
-Vue.use(Loading, { text: '题目生成中', color: 'green' })
+Vue.use(Loading, { text: '稍等...', color: '#874b4b' })
 
 const options = {
     color: '#874b4b',

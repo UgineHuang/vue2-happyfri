@@ -11,6 +11,10 @@ const STAFF_SEND = 'STAFF_SEND'
 
 const PRIFIX_TIMER = 'PRIFIX_TIMER'
 
+const SET_ITEMDETAIL = 'SET_ITEMDETAIL'
+const SET_FINALSCORE = 'SET_FINALSCORE'
+const SET_ANSWERTIME = 'SET_ANSWERTIME'
+
 export default {
 	//点击进入下一题
 	[ADD_ITEMNUM](state, num) {
@@ -53,5 +57,14 @@ export default {
 	},	
 	[PRIFIX_TIMER](state, timer) {
 		state.pri_timer = timer;
-	}
+	},
+    [SET_ITEMDETAIL](state,itemDetail){
+        state.itemDetail = itemDetail;
+    },
+    [SET_FINALSCORE](state,name){
+        state.finalScore = name;
+    },
+    [SET_ANSWERTIME](state,name){
+        state.answerTime = name;
+    },
 }

@@ -179,6 +179,7 @@ const state = {
 	answerid: [], //答案id,
 	stompClient: null,
 	pri_timer: null,
+    finalScore: 0
 
 }
 

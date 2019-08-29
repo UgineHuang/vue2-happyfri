@@ -2,11 +2,12 @@
   	<section>
     	<header class="top_tips" v-if="fatherComponent == 'home'">
     		<span class="num_tip">快到垃圾桶里来</span>
+            <span>{{USERNAME}}</span>
     	</header>
     	<div v-if="fatherComponent == 'home'">
     		<div class="home_logo item_container_style"></div>
             <div class="players" v-loading="isLoading">
-                <h3>请选择以下玩家对战</h3>
+                <h3 @click="websocket()">请选择以下玩家对战</h3>
                 <ul>
                     <li v-for="(item, index) in onlinePlayers" @click="choosePlayer(index,item)">
                         <span class="option_detail" v-bind:class="{'choosed':choosedPlayer==item}">{{item}}</span>
@@ -20,18 +21,18 @@
     			<div class="item_list_container" v-if="itemDetail.length > 0">
                     <vue-progress-bar></vue-progress-bar>
                     <div class="scoreArea">
-                        <countTo :startVal='startVal' :endVal='endVal' :duration='3000' class="myScore"></countTo>
-                        <countTo :startVal='anOtherScore' :endVal='endVal' :duration='3000' class="anOtherScore"></countTo>
+                        <countTo :startVal='m_startVal' :endVal='myScore' :duration='3000' class="myScore"></countTo>
+                        <countTo :startVal='o_startVal' :endVal='anOtherScore' :duration='3000' class="anOtherScore"></countTo>
                     </div>
     				<div class="item_title">{{itemDetail[itemNum-1].topic_name}}</div>
-                    <ul>
-                        <li  v-for="(item, index) in itemDetail[itemNum-1].topic_answer" @click="choosed(index, item.topic_answer_id)" class="item_list" v-bind:class="{'has_choosedlist':choosedNum==index}">
+                    <ul v-loading="hasAnswered">
+                        <li  v-for="(item, index) in itemDetail[itemNum-1].topic_answer" @click="choosed(index, item.topic_answer_id,item.is_standard_answer)" class="item_list" v-bind:class="{'has_choosedlist':choosedNum==index}">
                             <span class="" v-bind:class="{'has_choosed':choosedNum==index}"></span>
                             <!--<span class="option_detail">{{item.answer_name}}</span>-->
-                            <img style="width: 80%" src="../images/ganlaji.png" v-if="index == 0">
+                            <img style="width: 80%" src="../images/ganlaji.png" v-if="index == 2">
                             <img style="width: 80%" src="../images/kehuishouwu.png" v-if="index == 1">
-                            <img style="width: 80%" src="../images/shilaji.png" v-if="index == 2">
-                            <img style="width: 80%" src="../images/youhailaji.png" v-if="index == 3">
+                            <img style="width: 80%" src="../images/shilaji.png" v-if="index == 3">
+                            <img style="width: 80%" src="../images/youhailaji.png" v-if="index == 0">
                         </li>
                     </ul>
     			</div>
@@ -56,10 +57,13 @@ export default {
 			choosedId:null, //选中答案id
             choosedPlayer: null,
             myScore: 0,
-            anOtherScore: 10,
-            startVal: 0,
-            endVal: 20,
-            isLoading: false
+            anOtherScore: 0,
+            m_startVal: 0,
+            o_startVal: 0,
+            isLoading: false,
+            hasAnswered:false,
+            tempScore:0,
+            isOverTime: null
 		}
 	},
   	props:['fatherComponent'],
@@ -72,20 +76,22 @@ export default {
         'onlinePlayers',
         'ANOTHER',
         'USERNAME',
-        'stompClient'
+        'stompClient',
+        'pri_timer'
 ]),
   	methods: {
   		...mapActions([
-  			'addNum', 'initializeData','setAnother'
+  			'addNum', 'initializeData','setAnother','setItemDetail','setFinalScore','setAnswerTime','connectWebsocket', 'setPritimer'
   		]),
   		//点击下一题
   		nextItem(){
+            this.hasAnswered = false;
   			if (this.choosedNum !== null) {
 	  			this.choosedNum = null;
 	  			//保存答案, 题目索引加一，跳到下一题
 	  			this.addNum(this.choosedId);
                 this.$Progress.start();
-                self.answerTime = new Date().getTime();
+                this.setAnswerTime(new Date().getTime());
   			}else{
   				alert('您还没有选择答案哦')
   			}
@@ -100,17 +106,21 @@ export default {
 	  		}
 	  	},
 	  	//选中的答案信息
-	  	choosed(type,id){
+	  	choosed(type,id,isStandardAnswer){
+            this.hasAnswered = true;
 	  		this.choosedNum = type;
 	  		this.choosedId = id;
-	  		this.computeScore();
+	  		this.computeScore(isStandardAnswer);
             this.$Progress.finish();
-            console.log(self.answerTime);
+            console.log(this.myScore);
+            this.stompClient.send("/app/game.do_exam", {},
+                JSON.stringify({type: 'DO_EXAM', content: this.tempScore, sender: this.USERNAME}));
 	  	},
 	  	//到达最后一题，交卷，请空定时器，跳转分数页面
 	  	submitAnswer(){
 	  		if (this.choosedNum !== null) {
 	  			this.addNum(this.choosedId)
+                this.setFinalScore(this.myScore)
 	  			clearInterval(this.timer)
 	  			this.$router.push('score')
   			}else{
@@ -123,27 +133,12 @@ export default {
             this.setAnother(aother);
 //            console.log(this.USERNAME)
 //            console.log(this.ANOTHER)
-            this.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
-                console.log('广播成功');
-                let mess = JSON.parse(msg.body);
-                console.log(mess);
-                if(mess.chatMessage.type=='ADD_USER'){
-                    console.log('ADD_USER');
-                    let onlinePlayers = eval(mess.chatMessage.content);
-                    self.callback(onlinePlayers);
-                }else if(mess.chatMessage.type=='CHOOSE_USER'){
-                    console.log('CHOOSE_USER');
-                    this.goToPlay();
-                }else if(mess.chatMessage.type=='DO_EXAM'){
-
-                }
-            });
-            this.stompClient.send("/app/game.choose_user", {},
-                JSON.stringify({type: 'CHOOSE_USER', content: this.ANOTHER, sender: this.USERNAME}));
-
         },
         loading(){
             this.isLoading = true;
+            this.websocket();
+            this.stompClient.send("/app/game.choose_user", {},
+                JSON.stringify({type: 'CHOOSE_USER', content: this.ANOTHER, sender: this.USERNAME}));
         },
         //跳转对战页面
         goToPlay(){
@@ -151,9 +146,46 @@ export default {
             this.$router.push('item');
         },
         //计算得分
-        computeScore(){
+        computeScore(isStandardAnswer){
+            //计算用户得分
             var time = new Date().getTime();
-            self.answerTime = time - self.answerTime;
+            this.setAnswerTime(time - this.answerTime);
+            if(isStandardAnswer){
+                if(this.answerTime<4000){
+                    this.startVal = this.myScore
+                    this.tempScore = 10;
+                    this.myScore +=10;
+                }else if(this.answerTime>10000){
+                    this.startVal = this.myScore
+                    this.tempScore = 8;
+                    this.myScore +=8;
+                }
+            }else{
+                this.tempScore = 0;
+            }
+        },
+        websocket(){
+            this.stompClient.subscribe('/topic/game', (msg) => { // 订阅服务端提供的某个topic
+                console.log('广播成功');
+                let mess = JSON.parse(msg.body);
+                if(mess.chatMessage.type=='ADD_USER'){
+                    console.log('ADD_USER');
+                }else if(mess.chatMessage.type=='CHOOSE_USER'){
+                    console.log('CHOOSE_USER'+mess.chatMessage.receiver.indexOf(this.USERNAME));
+                    console.log();
+                    if(mess.chatMessage.receiver.indexOf(this.USERNAME) != -1){
+                        let itemDetail = eval(mess.chatMessage.content);
+                        this.setItemDetail(itemDetail);
+                        this.goToPlay();
+                    }
+                }else if(mess.chatMessage.type=='DO_EXAM'){
+                    console.log('DO_EXAM'+mess.chatMessage.receiver.indexOf(this.USERNAME));
+                    if(mess.chatMessage.receiver.indexOf(this.USERNAME) != -1){
+                        this.o_startVal = this.anOtherScore;
+                        this.anOtherScore += parseInt(mess.chatMessage.content);
+                    }
+                }
+            });
         }
     },
 	created(){
@@ -176,7 +208,12 @@ export default {
         }
 	},
     mounted(){
-        self.answerTime = new Date().getTime();
+        this.setAnswerTime(new Date().getTime());
+        if(this.stompClient){
+            this.websocket();
+        }else{
+
+        }
     }
 }
 </script>

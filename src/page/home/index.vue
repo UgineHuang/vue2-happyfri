@@ -68,9 +68,14 @@ export default {
                         let mess = JSON.parse(msg.body);
                         console.log(mess);
                         if(mess.chatMessage.type=='ADD_USER'){
-                            console.log('ADD_USER');
-                            let onlinePlayers = eval(mess.chatMessage.content);
-                            self.callback(onlinePlayers);
+                            console.log('ADD_USER'+mess.chatMessage.receiver.indexOf(self.USERNAME));
+                            if(mess.chatMessage.receiver.indexOf(self.USERNAME) != -1){
+                                let onlinePlayers = eval(mess.chatMessage.content);
+                                self.callback(onlinePlayers);
+                            }else{
+                                let onlinePlayers = [];
+                                self.callback(onlinePlayers);
+                            }
                         }else if(mess.chatMessage.type=='CHOOSE_USER'){
                             console.log('CHOOSE_USER');
                         }else if(mess.chatMessage.type=='DO_EXAM'){
@@ -92,7 +97,8 @@ export default {
             //设置state.onlinePlayers
             this.$store.commit('SET_ONLINEPLAYERS',arr);
         }
-    }
+    },
+    mounted(){}
 }
 </script>
 
